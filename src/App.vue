@@ -1,8 +1,19 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 const todos = ref<{ id: string; title: string; description: string }[]>([]);
 const title = ref("");
 const description = ref("");
+const search = ref("");
+const filteredTodos = computed(() => {
+	if (!search.value) {
+		return todos.value;
+	}
+	if (search) {
+		return todos.value.filter((todo) =>
+			todo.title.toLowerCase().includes(search.value.toLowerCase())
+		);
+	}
+});
 const handleAddTodo = () => {
 	if (title.value && description.value) {
 		todos.value.push({
@@ -21,6 +32,7 @@ const handleDelete = (id: string) => {
 
 <template>
 	<div class="main">
+		<input type="text" placeholder="search" v-model="search" />
 		<div class="controls">
 			<input placeholder="title" v-model="title" />
 			<input placeholder="description" v-model="description" />
@@ -28,7 +40,7 @@ const handleDelete = (id: string) => {
 		</div>
 		<h2>Todos</h2>
 		<div class="todos">
-			<div class="todo" v-for="todo in todos">
+			<div class="todo" v-for="todo in filteredTodos">
 				<span>Title:{{ todo.title }}</span>
 				<span>Description:{{ todo.description }}</span>
 				<button @click="handleDelete(todo.id)">Delete</button>
